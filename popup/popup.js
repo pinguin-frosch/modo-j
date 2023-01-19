@@ -1,6 +1,21 @@
-const modo = document.querySelector('#modo')
-const texto_modo = document.querySelector('#texto_modo')
+const activo = document.querySelector('#activo')
+const texto = document.querySelector('#texto')
 
-modo.addEventListener('input', (e) => {
-    texto_modo.innerHTML = e.target.checked ? 'Modo J' : 'Modo P'
+// Leer al iniciar la extensión
+chrome.storage.sync.get('activo', (data) => {
+    activo.checked = data.activo
+    change_text(data.activo)
 })
+
+// Cambiar el estado al hacer click
+activo.addEventListener('input', (e) => {
+    change_text(e.target.checked)
+    chrome.storage.sync.set({
+        'activo': e.target.checked
+    })
+})
+
+// Cambiar el texto
+function change_text(activo) {
+    texto.innerHTML = activo ? 'Modo J' : 'Modo P'
+}
