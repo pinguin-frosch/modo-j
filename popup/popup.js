@@ -1,6 +1,11 @@
 const activo = document.querySelector('#activo')
 const texto = document.querySelector('#texto')
 
+// Abrir la página de opciones
+document.querySelector('#opciones').addEventListener('click', () => {
+    chrome.runtime.openOptionsPage()
+})
+
 // Leer al iniciar la extensión
 chrome.storage.sync.get('activo', (data) => {
     activo.checked = data.activo
