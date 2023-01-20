@@ -14,7 +14,7 @@
 <body>
     <div class="container">
         <h1 class="mb-3">Sitios filtrados</h1>
-        <button class="btn btn-primary mb-3">Agregar sitio</button>
+        <button class="btn btn-primary mb-3" id="agregar">Agregar sitio</button>
 
         <table class="table table-bordered table-striped mb-3">
             <thead>
@@ -23,23 +23,41 @@
                 <th>Actualizar</th>
                 <th>Eliminar</th>
             </thead>
-            <tbody>
-                <tr>
-                    <td>www.google.com</td>
-                    <td>
-                        <input type="checkbox" checked>
-                    </td>
-                    <td>
-                        <button class="btn btn-success">Actualizar</button>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger">Eliminar</button>
-                    </td>
-                </tr>
-            </tbody>
+            <tbody id="sitios"></tbody>
         </table>
 
     </div>
+
+    <!-- Modal para agregar/actualizar -->
+    <div class="modal" id="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-2">
+                            <label for="sitio">Sitio:</label>
+                            <input type="text" class="form-control" id="sitio">
+                        </div>
+                        <div class="mb-2 form-check">
+                            <input type="checkbox" class="form-check-input" id="activo" checked>
+                            <label class="form-check-label" for="sitio">Activo</label>
+                        </div>
+                        <input type="hidden" id="id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="guardar">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="options.js"></script>
 </body>
 
 </html>
