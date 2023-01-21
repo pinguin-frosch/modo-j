@@ -10,7 +10,11 @@ document.querySelector('#agregar').addEventListener('click', () => {
     document.querySelector('#sitio').value = ''
     document.querySelector('#activo').checked = true
 
+    // Mostrar el modal
     modal.show()
+
+    // Fijar el foco
+    document.querySelector('#sitio').focus()
 })
 
 // Actualizar
@@ -22,7 +26,11 @@ const actualizar_sitio = (id) => {
     document.querySelector('#sitio').value = document.querySelector(`[data-id="${id}"] td`).textContent
     document.querySelector('#activo').checked = document.querySelector(`[data-id="${id}"] input`).checked
 
+    // Mostrar el modal
     modal.show()
+
+    // Fijar el foco
+    document.querySelector('#sitio').focus()
 }
 
 // Eliminar
