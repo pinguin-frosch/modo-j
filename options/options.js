@@ -1,11 +1,39 @@
 // No entiendo por qué pero tuve que usar getOrCreateInstance en vez de getInstance
 const modal = bootstrap.Modal.getOrCreateInstance(document.querySelector('#modal'))
 
+// Agregar
 document.querySelector('#agregar').addEventListener('click', () => {
     document.querySelector('#modal-title').textContent = 'Agregar sitio'
+
+    // Limpiar el formulario
+    document.querySelector('#id').value = ''
+    document.querySelector('#sitio').value = ''
+    document.querySelector('#activo').checked = true
+
     modal.show()
 })
 
+// Actualizar
+const actualizar_sitio = (id) => {
+    document.querySelector('#modal-title').textContent = 'Actualizar sitio'
+
+    // Cambiar los valores del formulario
+    document.querySelector('#id').value = id
+    document.querySelector('#sitio').value = document.querySelector(`[data-id="${id}"] td`).textContent
+    document.querySelector('#activo').checked = document.querySelector(`[data-id="${id}"] input`).checked
+
+    modal.show()
+}
+
+// Eliminar
+const eliminar_sitio = async (id) => {
+    const data = await chrome.storage.sync.get('sitios')
+    data.sitios.splice(id, 1)
+    await chrome.storage.sync.set(data)
+    cargar_sitios()
+}
+
+// Leer
 const sitios_contenedor = document.querySelector('#sitios')
 const cargar_sitios = async () => {
     // Obtener los sitios
@@ -38,14 +66,14 @@ const cargar_sitios = async () => {
         const actualizar = document.createElement('button')
         actualizar.classList.add('btn', 'btn-primary', 'btn-sm')
         actualizar.textContent = 'Actualizar'
-        actualizar.addEventListener('click', actualizar_sitio)
+        actualizar.addEventListener('click', () => { actualizar_sitio(index) })
         tr.children[2].appendChild(actualizar)
 
         // Agregar botón de eliminar
         const eliminar = document.createElement('button')
         eliminar.classList.add('btn', 'btn-danger', 'btn-sm')
         eliminar.textContent = 'Eliminar'
-        eliminar.addEventListener('click', eliminar_sitio)
+        eliminar.addEventListener('click', () => { eliminar_sitio(index) })
         tr.children[3].appendChild(eliminar)
 
         // Agregar la fila
@@ -63,8 +91,15 @@ document.querySelector('#guardar').addEventListener('click', async () => {
     const id = document.querySelector('#id')
 
     if (sitio.value) {
-        if (id.value) { } else {
-
+        if (id.value) {
+            // Guardar en el almacenamiento
+            const data = await chrome.storage.sync.get('sitios')
+            data.sitios[id.value] = {
+                'sitio': sitio.value,
+                'activo': activo.checked
+            }
+            await chrome.storage.sync.set(data)
+        } else {
             // Guardar en el almacenamiento
             const data = await chrome.storage.sync.get('sitios')
             data.sitios.push({
@@ -72,24 +107,11 @@ document.querySelector('#guardar').addEventListener('click', async () => {
                 'activo': activo.checked
             })
             await chrome.storage.sync.set(data)
-
-            // Recargar los sitios
-            cargar_sitios()
-
-            // Limpiar el formulario
-            sitio.value = ''
-            activo.checked = true
-            modal.hide()
         }
+        // Recargar los sitios
+        cargar_sitios()
+
+        // Cerrar el modal
+        modal.hide()
     }
 })
-
-// Actualizar
-function actualizar_sitio() {
-    console.log('Actualizar sitio')
-}
-
-// Eliminar
-function eliminar_sitio() {
-    console.log('Eliminar sitio')
-}
