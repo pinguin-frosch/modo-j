@@ -30,6 +30,4 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
             activo = changes.activo.newValue
         }
     }
-    console.log('sitios:', sitios)
-    console.log('activo:', activo)
 })

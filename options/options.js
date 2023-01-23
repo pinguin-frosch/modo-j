@@ -35,31 +35,26 @@ const actualizar_sitio = (id) => {
 
 // Eliminar
 const eliminar_sitio = async (id) => {
-    const data = await chrome.storage.sync.get('sitios')
-    data.sitios.splice(id, 1)
-    await chrome.storage.sync.set(data)
+    await chrome.declarativeNetRequest.updateDynamicRules({
+        'removeRuleIds': [id]
+    })
     cargar_sitios()
 }
 
 // Leer
 const sitios_contenedor = document.querySelector('#sitios')
 const cargar_sitios = async () => {
-    // Obtener los sitios
-    const data = await chrome.storage.sync.get('sitios')
+    const filtros = await chrome.declarativeNetRequest.getDynamicRules()
 
     // Limpiar el contenedor
     sitios_contenedor.innerHTML = ''
 
-    // Agregar los sitios
-    for (const [index, sitio] of data.sitios.entries()) {
-
-        // Crear una fila
+    for (const filtro of filtros) {
         const tr = document.createElement('tr')
-        tr.dataset.id = index
+        tr.setAttribute('data-id', filtro.id)
 
-        // Agregar el sitio
         tr.innerHTML = `
-            <td>${sitio.sitio}</td>
+            <td>${filtro.condition.urlFilter}</td>
             <td></td>
             <td></td>
             <td></td>
@@ -67,24 +62,24 @@ const cargar_sitios = async () => {
 
         // Agregar el checkbox
         tr.children[1].innerHTML = `
-            <input type="checkbox" ${sitio.activo ? 'checked' : ''} disabled>
+            <input type="checkbox" ${filtro.action.type === 'block' ? 'checked' : ''} disabled>
         `
 
-        // Agregar botón de actualizar
+        // Botón actualizar
         const actualizar = document.createElement('button')
         actualizar.classList.add('btn', 'btn-primary', 'btn-sm')
         actualizar.textContent = 'Actualizar'
-        actualizar.addEventListener('click', () => { actualizar_sitio(index) })
+        actualizar.addEventListener('click', () => { actualizar_sitio(filtro.id) })
         tr.children[2].appendChild(actualizar)
 
-        // Agregar botón de eliminar
+        // Botón eliminar
         const eliminar = document.createElement('button')
         eliminar.classList.add('btn', 'btn-danger', 'btn-sm')
         eliminar.textContent = 'Eliminar'
-        eliminar.addEventListener('click', () => { eliminar_sitio(index) })
+        eliminar.addEventListener('click', () => { eliminar_sitio(filtro.id) })
         tr.children[3].appendChild(eliminar)
 
-        // Agregar la fila
+        // Agregar el tr al tbody
         sitios_contenedor.appendChild(tr)
     }
 }
@@ -100,22 +95,25 @@ document.querySelector('#guardar').addEventListener('click', async () => {
 
     if (sitio.value) {
         if (id.value) {
-            // Guardar en el almacenamiento
-            const data = await chrome.storage.sync.get('sitios')
-            data.sitios[id.value] = {
-                'sitio': sitio.value,
-                'activo': activo.checked
-            }
-            await chrome.storage.sync.set(data)
-        } else {
-            // Guardar en el almacenamiento
-            const data = await chrome.storage.sync.get('sitios')
-            data.sitios.push({
-                'sitio': sitio.value,
-                'activo': activo.checked
+            // Eliminar el filtro anterior
+            await chrome.declarativeNetRequest.updateDynamicRules({
+                'removeRuleIds': [parseInt(id.value)]
             })
-            await chrome.storage.sync.set(data)
         }
+        // Agregar el filtro
+        await chrome.declarativeNetRequest.updateDynamicRules({
+            'addRules': [{
+                'id': await obtener_id(),
+                'priority': 1,
+                'action': {
+                    'type': activo.checked ? 'block' : 'allow'
+                },
+                'condition': {
+                    'urlFilter': sitio.value,
+                    'resourceTypes': ['main_frame']
+                }
+            }]
+        })
         // Recargar los sitios
         cargar_sitios()
 
@@ -123,3 +121,14 @@ document.querySelector('#guardar').addEventListener('click', async () => {
         modal.hide()
     }
 })
+
+// Obtener el id para cada filtro
+async function obtener_id() {
+    const filtros = await chrome.declarativeNetRequest.getDynamicRules()
+    let mayor = 0
+    for (const filtro of filtros) {
+        if (filtro.id > mayor)
+            mayor = filtro.id
+    }
+    return mayor + 1
+}
