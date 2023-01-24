@@ -50,6 +50,7 @@ const cambiar_icono = (activo) => {
         path: {
             '16': `images/icon-${activo ? 'j' : 'p'}-16.png`,
             '32': `images/icon-${activo ? 'j' : 'p'}-32.png`,
+            '48': `images/icon-${activo ? 'j' : 'p'}-48.png`,
             '64': `images/icon-${activo ? 'j' : 'p'}-64.png`,
             '128': `images/icon-${activo ? 'j' : 'p'}-128.png`,
             '256': `images/icon-${activo ? 'j' : 'p'}-256.png`
