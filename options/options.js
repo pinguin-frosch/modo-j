@@ -2,8 +2,11 @@
 const modal = bootstrap.Modal.getOrCreateInstance(document.querySelector('#modal'))
 
 // Confirmar al pulsar enter
-document.querySelector('form').addEventListener('keyup', (e) => {
-    if (e.key === 'Enter') document.querySelector('#guardar').click()
+document.querySelector('form').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault()
+        document.querySelector('#guardar').click()
+    }
 })
 
 // Preparar el formulario para agregar
