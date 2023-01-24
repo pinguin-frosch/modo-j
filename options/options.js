@@ -1,7 +1,7 @@
 // No entiendo por qué pero tuve que usar getOrCreateInstance en vez de getInstance
 const modal = bootstrap.Modal.getOrCreateInstance(document.querySelector('#modal'))
 
-// Agregar
+// Preparar el formulario para agregar
 document.querySelector('#agregar').addEventListener('click', () => {
     document.querySelector('#modal-title').textContent = 'Agregar sitio'
 
@@ -17,7 +17,7 @@ document.querySelector('#agregar').addEventListener('click', () => {
     document.querySelector('#sitio').focus()
 })
 
-// Actualizar
+// Preparar el formulario para actualizar
 const actualizar_sitio = (id) => {
     document.querySelector('#modal-title').textContent = 'Actualizar sitio'
 
@@ -33,28 +33,30 @@ const actualizar_sitio = (id) => {
     document.querySelector('#sitio').focus()
 }
 
-// Eliminar
+// Eliminar un sitio de los filtros
 const eliminar_sitio = async (id) => {
-    await chrome.declarativeNetRequest.updateDynamicRules({
-        'removeRuleIds': [id]
+    const data = await chrome.storage.sync.get('sitios')
+    delete data.sitios[id]
+    await chrome.storage.sync.set({
+        sitios: data.sitios
     })
     cargar_sitios()
 }
 
-// Leer
+// Leer todos los sitios del almacenamiento
 const sitios_contenedor = document.querySelector('#sitios')
 const cargar_sitios = async () => {
-    const filtros = await chrome.declarativeNetRequest.getDynamicRules()
+    const data = await chrome.storage.sync.get('sitios')
 
     // Limpiar el contenedor
     sitios_contenedor.innerHTML = ''
 
-    for (const filtro of filtros) {
+    for (const filtro of Object.values(data.sitios)) {
         const tr = document.createElement('tr')
         tr.setAttribute('data-id', filtro.id)
 
         tr.innerHTML = `
-            <td>${filtro.condition.urlFilter}</td>
+            <td>${filtro.sitio}</td>
             <td></td>
             <td></td>
             <td></td>
@@ -62,7 +64,7 @@ const cargar_sitios = async () => {
 
         // Agregar el checkbox
         tr.children[1].innerHTML = `
-            <input type="checkbox" ${filtro.action.type === 'block' ? 'checked' : ''} disabled>
+            <input type="checkbox" ${filtro.activo ? 'checked' : ''} disabled>
         `
 
         // Botón actualizar
@@ -91,29 +93,32 @@ document.querySelector('#guardar').addEventListener('click', async () => {
     const activo = document.querySelector('#activo')
 
     // Determinar si es crear o actualizar
-    const id = document.querySelector('#id')
+    let id = document.querySelector('#id')
 
     if (sitio.value) {
         if (id.value) {
-            // Eliminar el filtro anterior
-            await chrome.declarativeNetRequest.updateDynamicRules({
-                'removeRuleIds': [parseInt(id.value)]
+            // Eliminar el sitio del almacenamiento
+            const data = await chrome.storage.sync.get('sitios')
+            delete data.sitios[id.value]
+            await chrome.storage.sync.set({
+                sitios: data.sitios
             })
         }
-        // Agregar el filtro
-        await chrome.declarativeNetRequest.updateDynamicRules({
-            'addRules': [{
-                'id': await obtener_id(),
-                'priority': 1,
-                'action': {
-                    'type': activo.checked ? 'block' : 'allow'
-                },
-                'condition': {
-                    'urlFilter': sitio.value,
-                    'resourceTypes': ['main_frame']
-                }
-            }]
+
+        // Generar el id
+        id = await obtener_id()
+
+        // Guardar en el almacenamiento
+        const data = await chrome.storage.sync.get('sitios')
+        data.sitios[id] = {
+            id: id,
+            sitio: sitio.value,
+            activo: activo.checked
+        }
+        await chrome.storage.sync.set({
+            sitios: data.sitios
         })
+
         // Recargar los sitios
         cargar_sitios()
 
@@ -124,9 +129,9 @@ document.querySelector('#guardar').addEventListener('click', async () => {
 
 // Obtener el id para cada filtro
 async function obtener_id() {
-    const filtros = await chrome.declarativeNetRequest.getDynamicRules()
+    const data = await chrome.storage.sync.get('sitios')
     let mayor = 0
-    for (const filtro of filtros) {
+    for (const filtro of Object.values(data.sitios)) {
         if (filtro.id > mayor)
             mayor = filtro.id
     }

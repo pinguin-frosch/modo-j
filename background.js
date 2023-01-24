@@ -2,32 +2,42 @@
 chrome.runtime.onInstalled.addListener(() => {
     chrome.storage.sync.set({
         'activo': false,
-        'sitios': []
+        'sitios': {}
     })
 })
 
-// Valores por defecto
-let sitios = []
-let activo = false
+// Variables globales
+let sitios = []; let activo = false
 
-// Leer los sitios
-chrome.storage.sync.get('sitios', (data) => {
-    sitios = data.sitios
-})
-
-// Leer el estado
-chrome.storage.sync.get('activo', (data) => {
+// Leer los valores desde el almacenamiento
+chrome.storage.sync.get(['sitios', 'activo'], (data) => {
+    sitios = Object.values(data.sitios || {}).filter(sitio => sitio.activo).map(sitio => sitio.sitio)
     activo = data.activo
 })
 
 // Actualizar los valores cuando cambien
 chrome.storage.onChanged.addListener((changes, namespace) => {
     if (namespace === 'sync') {
-        if (changes.sitios) {
-            sitios = changes.sitios.newValue
-        }
-        if (changes.activo) {
+        if (changes.sitios)
+            sitios = Object.values(changes.sitios.newValue).filter(sitio => sitio.activo).map(sitio => sitio.sitio)
+        if (changes.activo)
             activo = changes.activo.newValue
-        }
     }
 })
+
+// Bloquear páginas según preferencias
+const bloquear_sitio = (tabId, _, tab) => {
+    if (activo) {
+        for (let sitio of sitios) {
+            // Reemplazar ? y .
+            sitio = sitio.replace(/\?/g, '\\?').replace(/\./g, '\\.')
+            const regex = new RegExp(`^https?:\/\/([a-zA-Z0-9]*\.)?${sitio}\/?.*$`)
+
+            if (regex.test(tab.url) || regex.test(tab.pendingUrl))
+                chrome.tabs.update(tabId, { url: 'chrome://newtab' })
+        }
+    }
+}
+
+// Estar pendiente de cada pestaña
+chrome.tabs.onUpdated.addListener(bloquear_sitio)

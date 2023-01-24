@@ -8,7 +8,7 @@
     },
     "permissions": [
         "storage",
-        "declarativeNetRequest"
+        "tabs"
     ],
     "action": {
         "default_popup": "popup/popup.html",
