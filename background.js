@@ -20,8 +20,10 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     if (namespace === 'sync') {
         if (changes.sitios)
             sitios = Object.values(changes.sitios.newValue).filter(sitio => sitio.activo).map(sitio => sitio.sitio)
-        if (changes.activo)
+        if (changes.activo) {
             activo = changes.activo.newValue
+            cambiar_icono(activo)
+        }
     }
 })
 
@@ -41,3 +43,16 @@ const bloquear_sitio = (tabId, _, tab) => {
 
 // Estar pendiente de cada pestaña
 chrome.tabs.onUpdated.addListener(bloquear_sitio)
+
+// Cambiar el icono según el estado
+const cambiar_icono = (activo) => {
+    chrome.action.setIcon({
+        path: {
+            '16': `images/icon-${activo ? 'j' : 'p'}-16.png`,
+            '32': `images/icon-${activo ? 'j' : 'p'}-32.png`,
+            '64': `images/icon-${activo ? 'j' : 'p'}-64.png`,
+            '128': `images/icon-${activo ? 'j' : 'p'}-128.png`,
+            '256': `images/icon-${activo ? 'j' : 'p'}-256.png`
+        }
+    })
+}

@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "Hola Mundo",
-    "description": "Extensión de prueba",
+    "name": "Modo J",
+    "description": "Bloquea los sitios que desees y mejora tu productividad",
     "version": "1.0",
     "background": {
         "service_worker": "background.js"
@@ -12,7 +12,13 @@
     ],
     "action": {
         "default_popup": "popup/popup.html",
-        "default_icon": "images/icon-16.png"
+        "default_icon": {
+            "16": "images/icon-p-16.png",
+            "32": "images/icon-p-32.png",
+            "64": "images/icon-p-64.png",
+            "128": "images/icon-p-128.png",
+            "256": "images/icon-p-256.png"
+        }
     },
     "options_page": "options/options.html"
 }
