@@ -1,6 +1,11 @@
 // No entiendo por qué pero tuve que usar getOrCreateInstance en vez de getInstance
 const modal = bootstrap.Modal.getOrCreateInstance(document.querySelector('#modal'))
 
+// Confirmar al pulsar enter
+document.querySelector('form').addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') document.querySelector('#guardar').click()
+})
+
 // Preparar el formulario para agregar
 document.querySelector('#agregar').addEventListener('click', () => {
     document.querySelector('#modal-title').textContent = 'Agregar sitio'
