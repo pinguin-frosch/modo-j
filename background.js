@@ -1,13 +1,13 @@
 // Iniciar el estado en apagado
 chrome.runtime.onInstalled.addListener(() => {
     chrome.storage.sync.set({
-        'activo': false,
+        'activo': true,
         'sitios': {}
     })
 })
 
 // Variables globales
-let sitios = []; let activo = false
+let sitios = []; let activo = true
 
 // Leer los valores desde el almacenamiento
 chrome.storage.sync.get(['sitios', 'activo'], (data) => {

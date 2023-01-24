@@ -10,16 +10,16 @@
         "storage",
         "tabs"
     ],
+    "icons": {
+        "16": "images/icon-j-16.png",
+        "32": "images/icon-j-32.png",
+        "48": "images/icon-j-48.png",
+        "64": "images/icon-j-64.png",
+        "128": "images/icon-j-128.png",
+        "256": "images/icon-j-256.png"
+    },
     "action": {
-        "default_popup": "popup/popup.html",
-        "default_icon": {
-            "16": "images/icon-p-16.png",
-            "32": "images/icon-p-32.png",
-            "48": "images/icon-p-48.png",
-            "64": "images/icon-p-64.png",
-            "128": "images/icon-p-128.png",
-            "256": "images/icon-p-256.png"
-        }
+        "default_popup": "popup/popup.html"
     },
     "options_page": "options/options.html"
 }
