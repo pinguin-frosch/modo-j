@@ -104,17 +104,9 @@ document.querySelector('#guardar').addEventListener('click', async () => {
     let id = document.querySelector('#id')
 
     if (sitio.value) {
-        if (id.value) {
-            // Eliminar el sitio del almacenamiento
-            const data = await chrome.storage.sync.get('sitios')
-            delete data.sitios[id.value]
-            await chrome.storage.sync.set({
-                sitios: data.sitios
-            })
-        }
-
-        // Generar el id
-        id = await obtener_id()
+        // Generar o usar el mismo id
+        if (id.value) id = id.value
+        else id = await obtener_id()
 
         // Guardar en el almacenamiento
         const data = await chrome.storage.sync.get('sitios')
