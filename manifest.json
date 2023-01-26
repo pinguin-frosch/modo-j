@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Modo J",
     "description": "Bloquea los sitios que desees y mejora tu productividad",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "background": {
         "service_worker": "background.js"
     },

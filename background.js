@@ -12,7 +12,8 @@ let sitios = []; let activo = true
 // Leer los valores desde el almacenamiento
 chrome.storage.sync.get(['sitios', 'activo'], (data) => {
     sitios = Object.values(data.sitios || {}).filter(sitio => sitio.activo).map(sitio => sitio.sitio)
-    activo = data.activo
+    activo = data.activo === undefined ? true : data.activo
+    cambiar_icono(activo)
 })
 
 // Actualizar los valores cuando cambien
