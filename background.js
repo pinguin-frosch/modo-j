@@ -1,8 +1,8 @@
 // Iniciar el estado en apagado
 chrome.runtime.onInstalled.addListener(() => {
-    chrome.storage.sync.set({
-        'activo': true,
-        'sitios': {}
+    chrome.storage.sync.get(['activo', 'sitios'], (data) => {
+        if (data.activo === undefined) chrome.storage.sync.set({ 'activo': true })
+        if (data.sitios === undefined) chrome.storage.sync.set({ 'sitios': {} })
     })
 })
 
